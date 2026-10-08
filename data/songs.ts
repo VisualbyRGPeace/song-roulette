@@ -1,0 +1,140 @@
+import type { Song, SongCategory, SongLanguage } from "@/types/song";
+
+/**
+ * Local fallback dataset. Edit freely: add one row per song.
+ * Only well-known real songs are listed; `year` is left null when unsure.
+ * For classics, `artist` is the best-known performer or the composer.
+ * "trending" rows here are only a static "popular lately" list; live trending comes from the YouTube API.
+ */
+type Row = [
+  title: string,
+  artist: string,
+  year: number | null,
+  category: SongCategory,
+  language: SongLanguage,
+];
+
+const rows: Row[] = [
+  // ── Vietnamese · classic
+  ["Diễm Xưa", "Khánh Ly", null, "classic", "vi"],
+  ["Cát Bụi", "Khánh Ly", null, "classic", "vi"],
+  ["Một Cõi Đi Về", "Khánh Ly", null, "classic", "vi"],
+  ["Biển Nhớ", "Trịnh Công Sơn", null, "classic", "vi"],
+  ["Hạ Trắng", "Trịnh Công Sơn", null, "classic", "vi"],
+  ["Cho Một Người Nằm Xuống", "Trịnh Công Sơn", null, "classic", "vi"],
+  ["Giọt Mưa Thu", "Đặng Thế Phong", null, "classic", "vi"],
+  ["Con Thuyền Không Bến", "Đặng Thế Phong", null, "classic", "vi"],
+  ["Em Ơi Hà Nội Phố", "Phú Quang", null, "classic", "vi"],
+  ["Tình Ca", "Hoàng Việt", null, "classic", "vi"],
+  ["Mùa Xuân Đầu Tiên", "Văn Cao", 1976, "classic", "vi"],
+  ["Chiều Mưa Biên Giới", "Nguyễn Văn Đông", null, "classic", "vi"],
+
+  // ── Vietnamese · nostalgia
+  ["Tình Thôi Xót Xa", "Lam Trường", null, "nostalgia", "vi"],
+  ["Đàn Cá Gỗ", "Mỹ Tâm", null, "nostalgia", "vi"],
+  ["Người Hãy Quên Em", "Mỹ Tâm", null, "nostalgia", "vi"],
+  ["Cây Đàn Sinh Viên", "Mỹ Tâm", null, "nostalgia", "vi"],
+  ["Đừng Hỏi Em", "Mỹ Tâm", 2018, "nostalgia", "vi"],
+  ["Em Của Ngày Hôm Qua", "Sơn Tùng M-TP", 2013, "nostalgia", "vi"],
+  ["Cơn Mưa Ngang Qua", "Sơn Tùng M-TP", 2013, "nostalgia", "vi"],
+  ["Chắc Ai Đó Sẽ Về", "Sơn Tùng M-TP", 2014, "nostalgia", "vi"],
+  ["Âm Thầm Bên Em", "Sơn Tùng M-TP", 2015, "nostalgia", "vi"],
+  ["Nơi Này Có Anh", "Sơn Tùng M-TP", 2017, "nostalgia", "vi"],
+  ["Lạc Trôi", "Sơn Tùng M-TP", 2017, "nostalgia", "vi"],
+  ["Chạy Ngay Đi", "Sơn Tùng M-TP", 2018, "nostalgia", "vi"],
+  ["Hãy Trao Cho Anh", "Sơn Tùng M-TP", 2019, "nostalgia", "vi"],
+  ["Như Phút Ban Đầu", "Noo Phước Thịnh", null, "nostalgia", "vi"],
+  ["Tháng Tư Là Lời Nói Dối Của Em", "Hà Anh Tuấn", null, "nostalgia", "vi"],
+  ["Phía Sau Một Cô Gái", "Soobin Hoàng Sơn", 2017, "nostalgia", "vi"],
+  ["Bùa Yêu", "Bích Phương", 2017, "nostalgia", "vi"],
+  ["Đi Đu Đưa Đi", "Bích Phương", 2018, "nostalgia", "vi"],
+  ["Ngày Mai Em Đi", "Touliver, Lê Hiếu, Soobin Hoàng Sơn", null, "nostalgia", "vi"],
+  ["Bài Này Chill Phết", "Đen, MIN", 2018, "nostalgia", "vi"],
+  ["Có Chàng Trai Viết Lên Cây", "Phan Mạnh Quỳnh", null, "nostalgia", "vi"],
+  ["Vợ Người Ta", "Phan Mạnh Quỳnh", null, "nostalgia", "vi"],
+  ["Người Lạ Ơi", "Karik, Orange", null, "nostalgia", "vi"],
+  ["Bạc Phận", "K-ICM, Jack", 2019, "nostalgia", "vi"],
+  ["Để Mị Nói Cho Mà Nghe", "Hoàng Thùy Linh", 2019, "nostalgia", "vi"],
+
+  // ── Vietnamese · trending (static "popular lately")
+  ["Nàng Thơ", "Hoàng Dũng", 2020, "trending", "vi"],
+  ["Bước Qua Nhau", "Vũ.", null, "trending", "vi"],
+  ["Chúng Ta Của Hiện Tại", "Sơn Tùng M-TP", 2020, "trending", "vi"],
+  ["Có Chắc Yêu Là Đây", "Sơn Tùng M-TP", 2020, "trending", "vi"],
+  ["Muộn Rồi Mà Sao Còn", "Sơn Tùng M-TP", 2021, "trending", "vi"],
+  ["Đừng Làm Trái Tim Anh Đau", "Sơn Tùng M-TP", 2024, "trending", "vi"],
+  ["Waiting For You", "MONO", 2022, "trending", "vi"],
+  ["Đi Về Nhà", "Đen, JustaTee", 2022, "trending", "vi"],
+  ["Mang Tiền Về Cho Mẹ", "Đen, Nguyên Thảo", null, "trending", "vi"],
+  ["Mất Kết Nối", "Dương Domic", 2022, "trending", "vi"],
+  ["See Tình", "Hoàng Thùy Linh", 2022, "trending", "vi"],
+  ["Đen Đá Không Đường", "AMEE", 2022, "trending", "vi"],
+  ["Anh Nhà Ở Đâu Thế", "AMEE, B Ray", null, "trending", "vi"],
+  ["Không Thể Say", "HIEUTHUHAI", null, "trending", "vi"],
+  ["Bật Tình Yêu Lên", "Hòa Minzy, Tăng Duy Tân", 2023, "trending", "vi"],
+  ["Ngày Đầu Tiên", "Đức Phúc", null, "trending", "vi"],
+  ["Thích Quá Rùi Nà", "Wren Evans", null, "trending", "vi"],
+  ["Đưa Em Về Nhà", "GREY D, Chillies", null, "trending", "vi"],
+
+  // ── English · classic
+  ["Bohemian Rhapsody", "Queen", 1975, "classic", "en"],
+  ["Hotel California", "Eagles", 1976, "classic", "en"],
+  ["Let It Be", "The Beatles", 1970, "classic", "en"],
+  ["Yesterday", "The Beatles", 1965, "classic", "en"],
+  ["Imagine", "John Lennon", 1971, "classic", "en"],
+  ["Take Me Home, Country Roads", "John Denver", 1971, "classic", "en"],
+  ["Dancing Queen", "ABBA", 1976, "classic", "en"],
+  ["Yesterday Once More", "Carpenters", 1973, "classic", "en"],
+  ["Every Breath You Take", "The Police", 1983, "classic", "en"],
+  ["Billie Jean", "Michael Jackson", 1983, "classic", "en"],
+  ["Take On Me", "a-ha", 1985, "classic", "en"],
+  ["Sweet Child O' Mine", "Guns N' Roses", 1987, "classic", "en"],
+  ["Total Eclipse of the Heart", "Bonnie Tyler", 1983, "classic", "en"],
+  ["Girls Just Want to Have Fun", "Cyndi Lauper", 1983, "classic", "en"],
+  ["Nothing Else Matters", "Metallica", 1991, "classic", "en"],
+  ["I Will Always Love You", "Whitney Houston", 1992, "classic", "en"],
+
+  // ── English · nostalgia
+  ["My Heart Will Go On", "Celine Dion", 1997, "nostalgia", "en"],
+  ["Wonderwall", "Oasis", 1995, "nostalgia", "en"],
+  ["Zombie", "The Cranberries", 1994, "nostalgia", "en"],
+  ["Seasons in the Sun", "Westlife", 1999, "nostalgia", "en"],
+  ["Flying Without Wings", "Westlife", 1999, "nostalgia", "en"],
+  ["My Love", "Westlife", 2000, "nostalgia", "en"],
+  ["I Want It That Way", "Backstreet Boys", 1999, "nostalgia", "en"],
+  ["...Baby One More Time", "Britney Spears", 1998, "nostalgia", "en"],
+  ["Numb", "Linkin Park", 2003, "nostalgia", "en"],
+  ["Gangnam Style", "PSY", 2012, "nostalgia", "other"],
+  ["Just the Way You Are", "Bruno Mars", 2010, "nostalgia", "en"],
+  ["Someone Like You", "Adele", 2011, "nostalgia", "en"],
+  ["Love Story", "Taylor Swift", 2008, "nostalgia", "en"],
+  ["Counting Stars", "OneRepublic", 2013, "nostalgia", "en"],
+  ["Thinking Out Loud", "Ed Sheeran", 2014, "nostalgia", "en"],
+  ["Uptown Funk", "Mark Ronson, Bruno Mars", 2014, "nostalgia", "en"],
+  ["Shake It Off", "Taylor Swift", 2014, "nostalgia", "en"],
+  ["Hello", "Adele", 2015, "nostalgia", "en"],
+
+  // ── English / international · trending (static "popular lately")
+  ["Shape of You", "Ed Sheeran", 2017, "trending", "en"],
+  ["Perfect", "Ed Sheeran", 2017, "trending", "en"],
+  ["Despacito", "Luis Fonsi, Daddy Yankee", 2017, "trending", "other"],
+  ["Someone You Loved", "Lewis Capaldi", 2018, "trending", "en"],
+  ["Blinding Lights", "The Weeknd", 2019, "trending", "en"],
+  ["Cruel Summer", "Taylor Swift", 2019, "trending", "en"],
+  ["Dynamite", "BTS", 2020, "trending", "en"],
+  ["Stay", "The Kid LAROI, Justin Bieber", 2021, "trending", "en"],
+  ["As It Was", "Harry Styles", 2022, "trending", "en"],
+  ["Flowers", "Miley Cyrus", 2023, "trending", "en"],
+  ["Espresso", "Sabrina Carpenter", 2024, "trending", "en"],
+  ["Die With A Smile", "Lady Gaga, Bruno Mars", 2024, "trending", "en"],
+  ["APT.", "ROSÉ, Bruno Mars", 2024, "trending", "en"],
+];
+
+export const songs: Song[] = rows.map(([title, artist, year, category, language], index) => ({
+  id: String(index + 1).padStart(3, "0"),
+  title,
+  artist,
+  ...(year !== null ? { year } : {}),
+  category,
+  language,
+}));
