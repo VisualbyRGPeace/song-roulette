@@ -1,9 +1,8 @@
 import { songs as localSongs } from "@/data/songs";
 import type { Song, SongLanguage, TrendingResult } from "@/types/song";
 
-// Server-side only: this file reads YOUTUBE_API_KEY and must never be imported by a client component.
+// Runs at build time only (GitHub Actions). It reads YOUTUBE_API_KEY and must never be imported by a client component.
 
-const REVALIDATE_SECONDS = 3600;
 const VI_CHARS =
   /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i;
 
@@ -70,7 +69,7 @@ const localTrending = (): Song[] => localSongs.filter((s) => s.category === "tre
 /** Trending songs from YouTube when configured, otherwise (or on any error) the local list. */
 export async function getTrending(): Promise<TrendingResult> {
   const key = process.env.YOUTUBE_API_KEY;
-  if (!key) return { songs: localTrending(), status: "no-key" };
+  if (!key) return { songs: localTrending(), status: "no-key", fetchedAt: new Date().toISOString() };
 
   try {
     const params = new URLSearchParams({
@@ -81,20 +80,18 @@ export async function getTrending(): Promise<TrendingResult> {
       maxResults: "30",
       key,
     });
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`, {
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?${params}`);
     if (!res.ok) throw new Error(`YouTube API responded ${res.status}`);
 
     const data = (await res.json()) as YouTubeResponse;
     const live = (data.items ?? []).map(toSong).filter((s) => s.title.length > 0);
     if (live.length === 0) throw new Error("YouTube API returned no videos");
 
-    return { songs: live, status: "live" };
+    return { songs: live, status: "live", fetchedAt: new Date().toISOString() };
   } catch (error) {
     // Log server-side only; the UI just gets the fallback list.
     console.error("[trending]", error instanceof Error ? error.message : error);
-    return { songs: localTrending(), status: "error" };
+    return { songs: localTrending(), status: "error", fetchedAt: new Date().toISOString() };
   }
 }
 

@@ -3,7 +3,6 @@ import PageHeader from "@/components/PageHeader";
 import SongLibrary from "@/components/SongLibrary";
 import { getAllSongs } from "@/lib/youtube";
 
-export const revalidate = 3600;
 export const metadata: Metadata = { title: "Songs — Song Roulette" };
 
 export default async function SongsPage() {

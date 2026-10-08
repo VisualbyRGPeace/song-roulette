@@ -26,4 +26,6 @@ export type TrendingStatus = "live" | "no-key" | "error";
 export interface TrendingResult {
   songs: Song[];
   status: TrendingStatus;
+  /** ISO time the list was generated (build time on GitHub Pages) */
+  fetchedAt: string;
 }

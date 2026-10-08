@@ -7,11 +7,11 @@ Mở web → bấm **BỐC BÀI** → hát. Một web app tối giản, chọn n
 - Random không lặp: loại `MAX_RECENT_SONGS` (mặc định 10) bài gần nhất, đổi trong `lib/randomSong.ts`.
 - Lọc theo Category (All / Trending / Classics / Nostalgia) và Language (All / Vietnamese / English).
 - `/songs` thư viện + tìm kiếm (không dấu cũng tìm được), `/trending`, `/classics` (lọc theo thập niên), `/history` (localStorage, có CLEAR HISTORY).
-- Trending thật từ YouTube Data API nếu có key; không có key hoặc API lỗi thì tự dùng danh sách local, và trang `/trending` nói rõ điều đó (không giả "realtime").
+- Trending từ YouTube Data API (lúc build, làm mới mỗi giờ) nếu có key; không có key hoặc API lỗi thì tự dùng danh sách local, và trang `/trending` nói rõ điều đó (không giả "realtime").
 - Dark mode tự động theo hệ thống.
 
 ## Tech stack
-Next.js 14 (App Router) · TypeScript strict · Tailwind CSS 3 · Framer Motion · Lucide Icons.
+Next.js 14 (App Router, static export) · TypeScript strict · Tailwind CSS 3 · Framer Motion · Lucide Icons.
 
 ## Cài đặt & chạy local
 ```bash
@@ -21,8 +21,7 @@ npm run dev                  # http://localhost:3000
 ```
 Build production:
 ```bash
-npm run build
-npm run start
+npm run build   # export tĩnh ra thư mục out/
 ```
 
 ## Biến môi trường
@@ -38,28 +37,24 @@ npm run start
 3. Credentials → Create credentials → API key (nên giới hạn key chỉ cho YouTube Data API).
 4. Dán vào `.env.local`: `YOUTUBE_API_KEY=...`
 
-Server gọi `videos?chart=mostPopular&videoCategoryId=10` (Music), cache 1 giờ (`revalidate = 3600`). Mỗi lần revalidate tốn khoảng 1 quota unit. Lưu ý: tiêu đề video được tách "Artist - Song" theo heuristic nên đôi khi không hoàn hảo.
+Lúc build, code gọi `videos?chart=mostPopular&videoCategoryId=10` (Music). Mỗi lần build tốn khoảng 1 quota unit. Lưu ý: tiêu đề video được tách "Artist - Song" theo heuristic nên đôi khi không hoàn hảo.
 
-Frontend không bao giờ gọi YouTube trực tiếp. Các trang server gọi `lib/youtube.ts`, và route `/api/trending` trả cùng dữ liệu cho client/bên ngoài.
+Trình duyệt không bao giờ gọi YouTube trực tiếp: dữ liệu được nhúng sẵn vào trang lúc build.
 
 ## Chỉnh sửa kho bài
 Sửa `data/songs.ts`: mỗi dòng là `[title, artist, year | null, category, language]`. Bài local không có `youtubeId` nên nút YouTube mở kết quả tìm kiếm "tên bài + ca sĩ + karaoke".
 
-## Deploy (GitHub + Vercel)
-1. Push lên GitHub:
-   ```bash
-   git init && git add . && git commit -m "Song Roulette"
-   git branch -M main
-   git remote add origin <repo-url> && git push -u origin main
-   ```
-2. Vercel → Add New Project → import repo.
-3. Environment Variables: thêm `YOUTUBE_API_KEY` (và các biến tuỳ chọn).
-4. Deploy.
+## Deploy lên GitHub Pages
+Site được export tĩnh (`output: "export"`) và deploy bằng GitHub Actions (`.github/workflows/deploy.yml`).
 
-> GitHub Pages thuần túy chỉ host file tĩnh, không chạy được server-side (đọc key, cache `/api/trending`), nên Vercel phù hợp hơn.
+1. Push code lên nhánh `main`.
+2. Repo → **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. (Tuỳ chọn) **Settings → Secrets and variables → Actions → New repository secret**: tên `YOUTUBE_API_KEY`.
+4. Vào tab **Actions**, workflow chạy xong là site có tại `https://<username>.github.io/<repo>/`.
 
-## GitHub workflow gợi ý
-Nhánh `main` luôn deploy được; làm tính năng trên nhánh riêng → Pull Request → Vercel tạo preview deployment → merge. Chạy `npm run lint && npm run build` trước khi merge.
+Vì GitHub Pages không có server, YouTube API được gọi **lúc build** trong GitHub Actions (key nằm trong Secret, không bao giờ vào code hay trình duyệt). Workflow tự build lại mỗi giờ để làm mới trending; trang `/trending` ghi rõ thời điểm cập nhật. Không có secret thì site dùng danh sách bài local.
+
+Chạy thử bản export ở máy: `npm run build` (kết quả trong thư mục `out/`).
 
 ## Bảo mật
 `.env.local` đã nằm trong `.gitignore`. Không commit key.
